@@ -20,13 +20,16 @@ plugin for Noctalia v5.
 ## Usage
 
 1. Add the **Hyprland Visual Editor** widget to your bar.
-2. Add this line at the very end of `~/.config/hypr/hyprland.lua`:
-   ```lua
-   pcall(function() dofile(os.getenv("HOME") .. "/.cache/noctalia/HVE/overlay.lua") end)
-   ```
-3. Click the bar widget to open the panel. Pick a preset (Animations, Borders or
-   Effects), press **Select**, then click the bar widget again to apply. HVE
-   regenerates the overlay and reloads Hyprland for you.
+2. Click the bar widget to open the panel. Pick a preset (Animations, Borders or
+   Effects) and press **Apply** — HVE applies it and reloads Hyprland instantly.
+
+On first enable, HVE appends the overlay loader to the end of your
+`~/.config/hypr/hyprland.lua` (idempotent, marked with a
+`HYPRLAND VISUAL EDITOR` comment). If you prefer to do it manually, the line is:
+
+```lua
+pcall(function() dofile(os.getenv("HOME") .. "/.cache/noctalia/HVE/overlay.lua") end)
+```
 
 The panel can also be toggled directly:
 
@@ -53,14 +56,15 @@ noctalia msg panel-toggle linux-fertxo/hyprland-visual-editor:hve-panel
 
 - HVE writes its generated overlay to `~/.cache/noctalia/HVE/overlay.lua` and
   reloads Hyprland with `hyprctl reload` after every apply. Your `hyprland.lua`
-  is never modified.
+  is never modified except for the one-time loader line above.
 - Ships 18 animation presets, 13 border presets and 9 GLSL shaders. Add your own
   by dropping a `.conf`/`.frag` into the matching `assets/` folder with the
   `@Title` / `@Desc` / `@Icon` / `@Color` / `@Tag` metadata header.
 - Shaders are applied as absolute-path `screen_shader` entries; re-apply the
   shader after moving the plugin directory.
+- UI is localized: English (`en`), Spanish (`es`) and Catalan (`ca`).
 
 ## Credits
 
 - **Architecture & core:** XimoCP (Noctalia v4, QML)
-- **Luau port (v5):** [fertxo](https://github.com/linux-fertxo)
+- **Luau port (v5):** Hermy & [linux-fertxo](https://github.com/linux-fertxo)

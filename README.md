@@ -23,4 +23,4 @@ noctalia msg plugins enable linux-fertxo/hyprland-visual-editor
 
 Based on the original work of [XimoCP](https://github.com/noctalia-dev)
 (Hyprland Visual Editor) and BukoMoon (Update Count), ported to Luau for
-Noctalia v5 by [fertxo](https://github.com/linux-fertxo).
+Noctalia v5 by Hermy & [linux-fertxo](https://github.com/linux-fertxo).

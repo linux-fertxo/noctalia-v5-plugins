@@ -1,7 +1,9 @@
 --!nonstrict
 -- HVE v5 — Panel Principal
 
-local cacheDir = (noctalia.getenv("XDG_CACHE_HOME") or (noctalia.getenv("HOME") .. "/.cache")) .. "/noctalia/HVE"
+local home = noctalia.getenv("HOME") or "/home/fertxo"
+local pdir = noctalia.pluginDir() or (home .. "/.config/noctalia/plugins/hyprland-visual-editor")
+local cacheDir = (noctalia.getenv("XDG_CACHE_HOME") or (home .. "/.cache")) .. "/noctalia/HVE"
 local stateFile = cacheDir .. "/hve_state.txt"
 
 local function parseItems(text)
@@ -34,7 +36,7 @@ local function loadState()
   local anim = noctalia.getConfig("active_anim_file") or ""
   local border = noctalia.getConfig("active_border_file") or ""
   local shader = noctalia.getConfig("active_shader_file") or ""
-  
+
   local content = noctalia.readFile(stateFile)
   if content then
     for line in content:gmatch("[^\n]+") do
@@ -55,14 +57,15 @@ local selAnim, selBorder, selShader = 0, 0, 0
 local animItems = loadItems("animations")
 local borderItems = loadItems("borders")
 local shaderItems = loadItems("shaders")
-local tabNames = { "Home", "Animations", "Borders", "Effects" }
 local tabIcons = { "home", "movie", "border-all", "wand" }
+
+local function t(key)
+  return noctalia.tr(key)
+end
 
 -- Resuelve el destino: "archivo" si hay preset seleccionado y HVE activo, "none" si no
 local function resolveTarget(isOn, file)
-  if isOn and file ~= "" then
-    return file
-  end
+  if isOn and file ~= "" then return file end
   return "none"
 end
 
@@ -71,21 +74,25 @@ local function requestSave()
     .. "activeAnim=" .. activeAnim .. "\n"
     .. "activeBorder=" .. activeBorder .. "\n"
     .. "activeShader=" .. activeShader
-  noctalia.state.set("hve_save", state)
+  noctalia.runAsync("mkdir -p " .. cacheDir .. " && printf '%s' '" .. state .. "' > " .. stateFile, nil, 5000)
 end
 
-local function syncIPC()
-  noctalia.state.set("is_system_active", isActive)
-  noctalia.state.set("active_anim_file", activeAnim)
-  noctalia.state.set("active_border_file", activeBorder)
-  noctalia.state.set("active_shader_file", activeShader)
+local function applyAnimation(file)
+  noctalia.runAsync("bash " .. pdir .. "/assets/scripts/apply_animation.sh " .. file .. " && hyprctl reload 2>/dev/null", nil, 10000)
+end
+local function applyBorder(file)
+  noctalia.runAsync("bash " .. pdir .. "/assets/scripts/border.sh " .. file .. " && hyprctl reload 2>/dev/null", nil, 10000)
+end
+local function applyShader(file)
+  noctalia.runAsync("bash " .. pdir .. "/assets/scripts/shader.sh " .. file .. " && hyprctl reload 2>/dev/null", nil, 10000)
 end
 
 local function tabBar()
+  local names = { t("panel.home"), t("panel.animations"), t("panel.borders"), t("panel.effects") }
   local btns = {}
   for i = 1, 4 do
     table.insert(btns, ui.button({
-      text = tabNames[i], glyph = tabIcons[i],
+      text = names[i], glyph = tabIcons[i],
       onClick = "onTab" .. (i - 1), flexGrow = 1,
     }))
   end
@@ -94,9 +101,9 @@ end
 
 local function buildCategory(items, activeFile, category)
   if #items == 0 then
-    return ui.label({ text = "No presets found — run scan.sh", color = "on_surface_variant" })
+    return ui.label({ text = t("panel.no_presets"), color = "on_surface_variant" })
   end
-  local opts = { "None" }
+  local opts = { t("panel.none") }
   for i, item in ipairs(items) do
     local mark = (item.file == activeFile) and " ★" or ""
     table.insert(opts, item.title .. mark)
@@ -105,42 +112,48 @@ local function buildCategory(items, activeFile, category)
   if category == "Anim" then selVal = selAnim
   elseif category == "Border" then selVal = selBorder
   elseif category == "Shader" then selVal = selShader end
+  local applied = activeFile ~= "" and activeFile or t("panel.none")
   return ui.scroll({ flexGrow = 1, gap = 8 }, {
-    ui.label({ text = #items .. " presets available", fontSize = 12, color = "on_surface_variant" }),
+    ui.label({ text = #items .. " " .. t("panel.presets_available"), fontSize = 12, color = "on_surface_variant" }),
     ui.select({ options = opts, selectedIndex = selVal, onChange = "onSel" .. category }),
-    ui.button({ text = "Select", onClick = "onApply" .. category, flexGrow = 1 }),
-    ui.label({ text = "ℹ️ Then click the bar widget to apply", fontSize = 10, color = "on_surface_variant" }),
-    activeFile ~= "" and ui.label({ text = "✓ " .. activeFile, fontSize = 11, color = "primary" }) or nil,
+    ui.button({ text = t("panel.apply"), onClick = "onApply" .. category, flexGrow = 1 }),
+    ui.label({ text = t("panel.current_preset") .. ": " .. applied, fontSize = 11, color = "primary" }),
   })
 end
 
 function render()
   local content
   if activeTab == 0 then
-    content = ui.scroll({ flexGrow = 1, gap = 12 }, {
-      ui.label({ text = "🏠 HOME", fontSize = 16, color = "primary" }),
+    local summary = "✦ " .. #animItems .. " " .. t("panel.count_animations")
+      .. " | " .. #borderItems .. " " .. t("panel.count_borders")
+      .. " | " .. #shaderItems .. " " .. t("panel.count_shaders")
+    local homeChildren = {
+      ui.label({ text = "🏠 " .. string.upper(t("panel.home")), fontSize = 16, color = "primary" }),
       ui.row({ gap = 8, align = "center" }, {
         ui.toggle({ checked = isActive, onChange = "onToggleActive" }),
-        ui.label({ text = isActive and "HVE enabled" or "HVE disabled", flexGrow = 1 }),
+        ui.label({ text = isActive and t("panel.enabled") or t("panel.disabled"), flexGrow = 1 }),
       }),
-      ui.label({ text = "✦ " .. #animItems .. " animations | " .. #borderItems .. " borders | " .. #shaderItems .. " shaders", fontSize = 12, color = "on_surface_variant" }),
-      not isActive and ui.label({ text = "⚠️ Enable the toggle to apply changes", fontSize = 11, color = "error" }) or nil,
-      ui.label({ text = "ℹ️ Changes apply when you click the bar widget", fontSize = 11, color = "on_surface_variant" }),
-      ui.label({ text = "v4: XimoCP · v5: fertxo", fontSize = 11, color = "on_surface_variant" }),
-    })
+      ui.label({ text = summary, fontSize = 12, color = "on_surface_variant" }),
+    }
+    if not isActive then
+      table.insert(homeChildren, ui.label({ text = "⚠️ " .. t("panel.enable_warning"), fontSize = 11, color = "error" }))
+    end
+    table.insert(homeChildren, ui.label({ text = "ℹ️ " .. t("panel.apply_hint"), fontSize = 11, color = "on_surface_variant" }))
+    table.insert(homeChildren, ui.label({ text = t("panel.credits"), fontSize = 11, color = "on_surface_variant" }))
+    content = ui.scroll({ flexGrow = 1, gap = 12 }, homeChildren)
   elseif activeTab == 1 then
     content = ui.scroll({ flexGrow = 1, gap = 8 }, {
-      ui.label({ text = "🎬 ANIMATIONS", fontSize = 16, color = "primary" }),
+      ui.label({ text = "🎬 " .. string.upper(t("panel.animations")), fontSize = 16, color = "primary" }),
       buildCategory(animItems, activeAnim, "Anim"),
     })
   elseif activeTab == 2 then
     content = ui.scroll({ flexGrow = 1, gap = 8 }, {
-      ui.label({ text = "🔲 BORDERS", fontSize = 16, color = "primary" }),
+      ui.label({ text = "🔲 " .. string.upper(t("panel.borders")), fontSize = 16, color = "primary" }),
       buildCategory(borderItems, activeBorder, "Border"),
     })
   elseif activeTab == 3 then
     content = ui.scroll({ flexGrow = 1, gap = 8 }, {
-      ui.label({ text = "✨ EFFECTS", fontSize = 16, color = "primary" }),
+      ui.label({ text = "✨ " .. string.upper(t("panel.effects")), fontSize = 16, color = "primary" }),
       buildCategory(shaderItems, activeShader, "Shader"),
     })
   end
@@ -157,9 +170,7 @@ end
 
 function onToggleActive(value)
   isActive = (value == "true")
-  noctalia.state.set("is_system_active", isActive)
   requestSave()
-  syncIPC()
   render()
 end
 function onTab0() activeTab = 0; render() end
@@ -176,11 +187,8 @@ function onApplyAnim()
   else
     activeAnim = ""
   end
-  noctalia.state.set("hve_do_anim", resolveTarget(isActive, activeAnim))
-  noctalia.state.set("hve_do_border", "")
-  noctalia.state.set("hve_do_shader", "")
+  applyAnimation(resolveTarget(isActive, activeAnim))
   requestSave()
-  syncIPC()
   render()
 end
 function onApplyBorder()
@@ -189,11 +197,8 @@ function onApplyBorder()
   else
     activeBorder = ""
   end
-  noctalia.state.set("hve_do_anim", "")
-  noctalia.state.set("hve_do_border", resolveTarget(isActive, activeBorder))
-  noctalia.state.set("hve_do_shader", "")
+  applyBorder(resolveTarget(isActive, activeBorder))
   requestSave()
-  syncIPC()
   render()
 end
 function onApplyShader()
@@ -202,11 +207,8 @@ function onApplyShader()
   else
     activeShader = ""
   end
-  noctalia.state.set("hve_do_anim", "")
-  noctalia.state.set("hve_do_border", "")
-  noctalia.state.set("hve_do_shader", resolveTarget(isActive, activeShader))
+  applyShader(resolveTarget(isActive, activeShader))
   requestSave()
-  syncIPC()
   render()
 end
 function onClose() panel.close() end
