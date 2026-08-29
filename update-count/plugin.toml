@@ -1,0 +1,54 @@
+id = "linux-fertxo/update-count"
+name = "Update Count"
+version = "2.0.0"
+plugin_api = 3
+author = "BukoMoon (v4 original) + fertxo (v5 Luau port)"
+license = "GPLv3"
+dependencies = ["pacman-contrib"]
+tags = ["bar", "system"]
+icon = "world-download"
+description = "Show pending Arch package updates in the bar. Click to update."
+
+[[setting]]
+key = "update_interval_minutes"
+type = "int"
+label_key = "settings.update_interval_minutes.label"
+default = 30
+min = 5
+max = 1440
+
+[[setting]]
+key = "terminal_cmd"
+type = "string"
+label_key = "settings.terminal_cmd.label"
+default = "foot"
+
+[[setting]]
+key = "hide_on_zero"
+type = "bool"
+label_key = "settings.hide_on_zero.label"
+default = false
+
+[[setting]]
+key = "icon_name"
+type = "string"
+label_key = "settings.icon_name.label"
+default = "world-download"
+
+[[setting]]
+key = "custom_cmd_get_num_updates"
+type = "string"
+label_key = "settings.custom_cmd_get_num_updates.label"
+description_key = "settings.custom_cmd_get_num_updates.description"
+default = ""
+
+[[setting]]
+key = "custom_cmd_do_update"
+type = "string"
+label_key = "settings.custom_cmd_do_update.label"
+description_key = "settings.custom_cmd_do_update.description"
+default = ""
+
+[[widget]]
+id = "updates"
+entry = "widget.luau"

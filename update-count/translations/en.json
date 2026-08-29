@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "update_interval_minutes": {
+      "label": "Update interval (minutes)"
+    },
+    "terminal_cmd": {
+      "label": "Terminal"
+    },
+    "hide_on_zero": {
+      "label": "Hide when no updates"
+    },
+    "icon_name": {
+      "label": "Icon"
+    },
+    "custom_cmd_get_num_updates": {
+      "label": "Command to count updates",
+      "description": "Empty = auto-detect yay/paru/pacman"
+    },
+    "custom_cmd_do_update": {
+      "label": "Command to update",
+      "description": "Empty = auto-detect"
+    }
+  }
+}

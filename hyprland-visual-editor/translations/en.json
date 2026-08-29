@@ -1,0 +1,17 @@
+{
+  "settings": {
+    "is_system_active": {
+      "label": "System active",
+      "description": "Master switch that enables Hyprland Visual Editor effects."
+    },
+    "active_anim_file": {
+      "label": "Active animation"
+    },
+    "active_border_file": {
+      "label": "Active border"
+    },
+    "active_shader_file": {
+      "label": "Active shader"
+    }
+  }
+}

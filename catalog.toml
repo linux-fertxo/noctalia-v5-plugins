@@ -1,0 +1,25 @@
+# Noctalia v5 plugin catalog — fertxo's personal plugins
+
+[[plugin]]
+id = "linux-fertxo/hyprland-visual-editor"
+name = "Hyprland Visual Editor"
+version = "2.0.0"
+plugin_api = 3
+author = "XimoCP + fertxo"
+license = "MIT"
+icon = "adjustments-horizontal"
+description = "Visually edit Hyprland animations, borders, shaders and geometry from a Noctalia panel."
+tags = ["hyprland", "animation", "theming", "panel", "bar"]
+dependencies = ["hyprland", "bash", "python"]
+
+[[plugin]]
+id = "linux-fertxo/update-count"
+name = "Update Count"
+version = "2.0.0"
+plugin_api = 3
+author = "BukoMoon + fertxo"
+license = "GPLv3"
+icon = "world-download"
+description = "Show pending Arch package updates in the bar. Click to update."
+tags = ["bar", "system"]
+dependencies = ["pacman-contrib"]

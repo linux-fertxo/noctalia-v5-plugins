@@ -1,0 +1,12 @@
+# Noctalia plugin dev
+noctalia.d.luau
+
+# HVE runtime artifacts (regenerated on each apply)
+hyprland-visual-editor/assets/fragments/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
