@@ -1,6 +1,6 @@
 # Hyprland Visual Editor
 
-Visually edit Hyprland animations, borders, shaders and geometry from a Noctalia
+Visually edit Hyprland animations, borders and shaders from a Noctalia
 panel, without ever touching your `hyprland.lua`. A Luau port of XimoCP's v4
 plugin for Noctalia v5.
 

@@ -7,7 +7,7 @@ license = "MIT"
 dependencies = ["hyprland", "bash", "python"]
 tags = ["hyprland", "animation", "theming", "panel", "bar"]
 icon = "adjustments-horizontal"
-description = "Visually edit Hyprland animations, borders, shaders and geometry from a Noctalia panel."
+description = "Visually edit Hyprland animations, borders and shaders from a Noctalia panel."
 
 [[setting]]
 key = "is_system_active"
