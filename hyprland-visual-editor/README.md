@@ -4,6 +4,10 @@ Visually edit Hyprland animations, borders and shaders from a Noctalia
 panel, without ever touching your `hyprland.lua`. A Luau port of XimoCP's v4
 plugin for Noctalia v5.
 
+> **⚠️ Lua config required.** This plugin targets Hyprland's **Lua** configuration
+> (`hyprland.lua`). It does **not** work with the legacy hyprlang `.conf` format —
+> HVE generates Lua (`hl.animation`, `hl.config`) and loads it via `dofile`.
+
 ## Plugin
 
 | Field | Value |
@@ -13,7 +17,8 @@ plugin for Noctalia v5.
 
 ## Requirements
 
-- **Hyprland** running a Lua config (`hyprland.lua`).
+- **Hyprland** running a **Lua** config (`hyprland.lua`) — not the legacy
+  hyprlang `.conf` format.
 - **bash** and **python3** on `PATH` (the preset converter and assembler are
   shell scripts that call `python3`).
 
